@@ -3,37 +3,51 @@ const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
 
 let allSongs = [];
+let currentSongFile = null;
+let currentLi = null;
 
-
-songsList.innerHTML = "<li>Loading songs...</li>";
-
-
+// fetch songs
 fetch("/songs-list")
-  .then(res => {
-    if (!res.ok) throw new Error("Backend not reachable");
-    return res.json();
-  })
+  .then(res => res.json())
   .then(songs => {
     allSongs = songs;
     renderSongs(allSongs);
-  })
-  .catch(err => {
-    songsList.innerHTML =
-      "<li style='color:red'>Backend not running</li>";
-    console.error(err);
   });
 
-
+// render songs
 function renderSongs(songs) {
   songsList.innerHTML = "";
 
   songs.forEach(song => {
     const li = document.createElement("li");
-    li.textContent = song.title;
-    li.style.cursor = "pointer";
-    li.style.margin = "8px 0";
+    li.textContent = "▶ " + song.title;
 
     li.onclick = () => {
+      // SAME SONG → TOGGLE PLAY / PAUSE
+      if (currentSongFile === song.file) {
+        if (audio.paused) {
+          audio.play();
+          li.textContent = "⏸ " + song.title;
+        } else {
+          audio.pause();
+          li.textContent = "▶ " + song.title;
+        }
+        return;
+      }
+
+      // NEW SONG → SWITCH
+      if (currentLi) {
+        currentLi.classList.remove("active");
+        currentLi.textContent =
+          "▶ " + currentLi.textContent.replace("▶ ", "").replace("⏸ ", "");
+      }
+
+      currentSongFile = song.file;
+      currentLi = li;
+
+      li.classList.add("active");
+      li.textContent = "⏸ " + song.title;
+
       audio.src = `/songs/${song.file}`;
       audio.play();
     };
@@ -42,13 +56,24 @@ function renderSongs(songs) {
   });
 }
 
-
+// search logic
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
 
-  const filteredSongs = allSongs.filter(song =>
+  const filtered = allSongs.filter(song =>
     song.title.toLowerCase().includes(query)
   );
 
-  renderSongs(filteredSongs);
+  renderSongs(filtered);
+});
+
+// reset UI when song ends
+audio.addEventListener("ended", () => {
+  if (currentLi) {
+    currentLi.classList.remove("active");
+    currentLi.textContent =
+      "▶ " + currentLi.textContent.replace("⏸ ", "").replace("▶ ", "");
+  }
+  currentSongFile = null;
+  currentLi = null;
 });

@@ -1,14 +1,36 @@
 body {
-  font-family: Arial;
-  text-align: center;
-  margin-top: 100px;
-  background-color: #111;
+  font-family: Arial, sans-serif;
+  background: #111;
   color: white;
+  padding: 20px;
 }
 
-button {
-  font-size: 18px;
-  margin: 10px;
-  padding: 10px 20px;
+h1 {
+  margin-bottom: 10px;
+}
+
+#search {
+  padding: 8px;
+  width: 220px;
+  margin-bottom: 12px;
+}
+
+li {
+  list-style: none;
+  padding: 10px;
+  margin: 6px 0;
   cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+li:hover {
+  background: #222;
+}
+
+
+li.active {
+  background: #1db954;
+  color: black;
+  font-weight: bold;
 }
