@@ -3,7 +3,7 @@ const songsList = document.getElementById("songs");
 
 songsList.innerHTML = "<li>Loading songs...</li>";
 
-fetch("http://localhost:3000/songs-list")
+fetch("/songs-list")
   .then(res => {
     if (!res.ok) throw new Error("Backend not reachable");
     return res.json();
