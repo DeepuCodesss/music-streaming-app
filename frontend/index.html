@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>My Music App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>🎧 POTIFY </h1>
+  <h1>🎧 POTIFY</h1>
 
-  <audio id="audio" src="song.mp3"></audio>
+  <h3>Songs</h3>
+  <ul id="songs"></ul>
 
-  <button onclick="playMusic()">Play</button>
-  <button onclick="pauseMusic()">Pause</button>
+  <audio id="audio" controls></audio>
 
   <script src="script.js"></script>
 </body>
