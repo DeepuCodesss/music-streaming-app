@@ -14,7 +14,7 @@ tabs.forEach(tab => {
   };
 });
 
-// ---------- MUSIC LOGIC ----------
+// ---------- ELEMENTS ----------
 const audio = document.getElementById("audio");
 const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
@@ -24,6 +24,14 @@ const createPlaylistBtn = document.getElementById("createPlaylist");
 const playlistsList = document.getElementById("playlists");
 const playlistSelect = document.getElementById("playlistSelect");
 
+// controls
+const playPauseBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const repeatBtn = document.getElementById("repeatBtn");
+
+// ---------- STATE ----------
 let allSongs = [];
 let filteredSongs = [];
 let playlists = JSON.parse(localStorage.getItem("playlists")) || {};
@@ -31,7 +39,14 @@ let activePlaylist = null;
 
 let currentSongFile = null;
 let currentLi = null;
+let currentIndex = -1;
+
 let visibleCount = 20;
+
+// shuffle / repeat
+let isShuffle = false;
+// 0 = off, 1 = repeat all, 2 = repeat one
+let repeatMode = 0;
 
 // ---------- FETCH SONGS ----------
 fetch("/songs-list")
@@ -48,7 +63,7 @@ fetch("/songs-list")
 function renderSongs() {
   songsList.innerHTML = "";
 
-  filteredSongs.slice(0, visibleCount).forEach((song, i) => {
+  filteredSongs.slice(0, visibleCount).forEach((song, index) => {
     const li = document.createElement("li");
     li.textContent = "▶ " + song.title;
 
@@ -56,18 +71,20 @@ function renderSongs() {
     btn.textContent = activePlaylist ? "❌" : "+";
     btn.onclick = e => {
       e.stopPropagation();
-      activePlaylist ? removeSong(i) : addToPlaylist(song);
+      activePlaylist ? removeSong(index) : addToPlaylist(song);
     };
 
     li.appendChild(btn);
-    li.onclick = () => playSong(song, li);
+    li.onclick = () => playSong(song, li, index);
     songsList.appendChild(li);
   });
 }
 
-// ---------- PLAY / PAUSE / STOP LOGIC ----------
-function playSong(song, li) {
-  // SAME SONG → TOGGLE PLAY / PAUSE
+// ---------- PLAY / PAUSE / STOP ----------
+function playSong(song, li, index) {
+  currentIndex = index;
+
+  // SAME SONG → TOGGLE
   if (currentSongFile === song.file) {
     if (audio.paused) {
       audio.play();
@@ -81,7 +98,7 @@ function playSong(song, li) {
     return;
   }
 
-  // DIFFERENT SONG → STOP OLD
+  // STOP PREVIOUS
   if (currentLi) {
     currentLi.classList.remove("active");
     currentLi.firstChild.textContent =
@@ -120,18 +137,74 @@ window.addEventListener("scroll", () => {
   }
 });
 
-// ---------- AUTO PLAY NEXT SONG ----------
+// ---------- AUTOPLAY / SHUFFLE / REPEAT ----------
 audio.addEventListener("ended", () => {
-  if (!currentLi) return;
+  if (repeatMode === 2) {
+    audio.currentTime = 0;
+    audio.play();
+    return;
+  }
 
-  const nextLi = currentLi.nextElementSibling;
-  if (nextLi) {
-    nextLi.click(); // autoplay next
+  let nextIndex;
+
+  if (isShuffle) {
+    nextIndex = Math.floor(Math.random() * filteredSongs.length);
   } else {
-    currentSongFile = null;
-    currentLi = null;
+    nextIndex = currentIndex + 1;
+  }
+
+  if (nextIndex < filteredSongs.length) {
+    const nextLi = songsList.children[nextIndex];
+    if (nextLi) nextLi.click();
+  } else if (repeatMode === 1) {
+    const firstLi = songsList.children[0];
+    if (firstLi) firstLi.click();
   }
 });
+
+// ---------- CONTROLS ----------
+playPauseBtn.onclick = () => {
+  if (!currentLi) return;
+
+  if (audio.paused) {
+    audio.play();
+    currentLi.firstChild.textContent =
+      "⏸ " + currentLi.firstChild.textContent.replace("▶ ", "");
+  } else {
+    audio.pause();
+    currentLi.firstChild.textContent =
+      "▶ " + currentLi.firstChild.textContent.replace("⏸ ", "");
+  }
+};
+
+nextBtn.onclick = () => {
+  if (currentIndex + 1 < filteredSongs.length) {
+    const li = songsList.children[currentIndex + 1];
+    if (li) li.click();
+  }
+};
+
+prevBtn.onclick = () => {
+  if (currentIndex > 0) {
+    const li = songsList.children[currentIndex - 1];
+    if (li) li.click();
+  }
+};
+
+shuffleBtn.onclick = () => {
+  isShuffle = !isShuffle;
+  shuffleBtn.classList.toggle("active", isShuffle);
+};
+
+repeatBtn.onclick = () => {
+  repeatMode = (repeatMode + 1) % 3;
+
+  if (repeatMode === 0) repeatBtn.textContent = "🔁";
+  if (repeatMode === 1) repeatBtn.textContent = "🔁 All";
+  if (repeatMode === 2) repeatBtn.textContent = "🔂 One";
+
+  repeatBtn.classList.toggle("active", repeatMode !== 0);
+};
 
 // ---------- PLAYLISTS ----------
 createPlaylistBtn.onclick = () => {
@@ -152,10 +225,11 @@ function addToPlaylist(song) {
   save();
 }
 
-function removeSong(i) {
-  playlists[activePlaylist].splice(i, 1);
+function removeSong(index) {
+  playlists[activePlaylist].splice(index, 1);
   save();
   filteredSongs = playlists[activePlaylist];
+  visibleCount = filteredSongs.length;
   renderSongs();
 }
 
@@ -170,7 +244,7 @@ function renderPlaylists() {
     span.onclick = () => {
       activePlaylist = name;
       filteredSongs = playlists[name];
-      visibleCount = playlists[name].length;
+      visibleCount = filteredSongs.length;
       renderSongs();
     };
 

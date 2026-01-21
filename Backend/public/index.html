@@ -23,21 +23,40 @@
     <button class="tab" data-tab="account">Account</button>
   </nav>
 
-  <!-- HOME TAB -->
+  <!-- ================= HOME TAB ================= -->
   <section id="home" class="tab-content active">
+
+    <!-- SEARCH -->
     <input id="search" type="text" placeholder="Search songs..." />
 
     <h3>Songs</h3>
     <ul id="songs"></ul>
 
+    <!-- 🎛 PLAYER CONTROLS (REQUIRED FOR JS) -->
+    <div id="playerControls">
+      <button id="prevBtn">⏮</button>
+      <button id="playPauseBtn">⏯</button>
+      <button id="nextBtn">⏭</button>
+
+      <button id="shuffleBtn" title="Shuffle">🔀</button>
+      <button id="repeatBtn" title="Repeat">🔁</button>
+    </div>
+
+    <!-- AUDIO -->
     <audio id="audio" controls></audio>
+
   </section>
 
-  <!-- PLAYLIST TAB -->
+  <!-- ================= PLAYLIST TAB ================= -->
   <section id="playlistsTab" class="tab-content">
     <h3>📂 Playlists</h3>
 
-    <input id="playlistName" type="text" placeholder="New playlist name" />
+    <input
+      id="playlistName"
+      type="text"
+      placeholder="New playlist name"
+    />
+
     <button id="createPlaylist">Create</button>
 
     <select id="playlistSelect">
@@ -47,7 +66,7 @@
     <ul id="playlists"></ul>
   </section>
 
-  <!-- ACCOUNT TAB -->
+  <!-- ================= ACCOUNT TAB ================= -->
   <section id="account" class="tab-content">
     <h3>👤 Account</h3>
     <p>Login & profile coming soon.</p>
