@@ -205,3 +205,38 @@ footer {
     border-top: 1px solid #222;
   }
 }
+/* ---------- VOLUME SLIDER ---------- */
+#volumeSlider {
+  width: 90px;
+  height: 4px;
+  appearance: none;
+  background: #555;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* Chrome / Edge */
+#volumeSlider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Firefox */
+#volumeSlider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #1db954;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Mobile: hide volume slider (Spotify does this too) */
+@media (max-width: 600px) {
+  #volumeSlider {
+    display: none;
+  }
+}

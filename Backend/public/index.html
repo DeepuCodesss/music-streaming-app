@@ -66,13 +66,25 @@
       <span id="miniTitle">No song playing</span>
     </div>
 
-    <div id="miniControls">
-      <button id="prevBtn">⏮</button>
-      <button id="playPauseBtn">⏯</button>
-      <button id="nextBtn">⏭</button>
-      <button id="shuffleBtn">🔀</button>
-      <button id="repeatBtn">🔁</button>
-    </div>
+   <div id="miniControls">
+  <button id="prevBtn">⏮</button>
+  <button id="playPauseBtn">⏯</button>
+  <button id="nextBtn">⏭</button>
+
+  <button id="shuffleBtn">🔀</button>
+  <button id="repeatBtn">🔁</button>
+
+  <!-- 🔊 VOLUME -->
+  <input
+    type="range"
+    id="volumeSlider"
+    min="0"
+    max="100"
+    value="70"
+    title="Volume"
+  />
+</div>
+
 
     <!-- AUDIO (GLOBAL) -->
     <audio id="audio"></audio>

@@ -19,6 +19,7 @@ tabs.forEach(tab => {
 const audio = document.getElementById("audio");
 const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
+const volumeSlider = document.getElementById("volumeSlider");
 
 const playlistInput = document.getElementById("playlistName");
 const createPlaylistBtn = document.getElementById("createPlaylist");
@@ -80,6 +81,15 @@ function renderSongs() {
     songsList.appendChild(li);
   });
 }
+// ---------- VOLUME ----------
+audio.volume = 0.7; // default 70%
+
+if (volumeSlider) {
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value / 100;
+  });
+}
+
 
 // ---------- PLAY SONG ----------
 function playSong(song, li, index) {
