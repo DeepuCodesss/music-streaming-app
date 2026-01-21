@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // serve song files
 app.use("/songs", express.static(path.join(__dirname, "songs")));
 
-
+// 🎵 AUTO-LOAD + SORT SONGS
 app.get("/songs-list", (req, res) => {
   const songsDir = path.join(__dirname, "songs");
 
@@ -25,11 +25,17 @@ app.get("/songs-list", (req, res) => {
     }
 
     const songs = files
-      .filter(file => file.endsWith(".mp3"))
-      .map((file, index) => ({
-        id: index + 1,
+      .filter(file => file.toLowerCase().endsWith(".mp3"))
+      .map(file => ({
         title: file.replace(".mp3", ""),
         file: file
+      }))
+      // 🔤 SORT ALPHABETICALLY (CASE-INSENSITIVE)
+      .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }))
+      // 🔢 ADD IDS AFTER SORTING
+      .map((song, index) => ({
+        id: index + 1,
+        ...song
       }));
 
     res.json(songs);

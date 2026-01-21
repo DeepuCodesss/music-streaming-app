@@ -5,32 +5,58 @@ body {
   padding: 20px;
 }
 
+/* Title */
 h1 {
-  margin-bottom: 10px;
-}
-
-#search {
-  padding: 8px;
-  width: 220px;
   margin-bottom: 12px;
 }
 
-li {
-  list-style: none;
+/* Search box */
+#search {
   padding: 10px;
-  margin: 6px 0;
-  cursor: pointer;
+  width: 260px;
+  margin-bottom: 16px;
   border-radius: 6px;
-  transition: background 0.2s;
+  border: none;
+  outline: none;
 }
 
+/* Song list container */
+#songs {
+  padding: 0;
+  margin: 0;
+  max-width: 700px;
+}
+
+/* Individual song item */
+li {
+  list-style: none;
+  padding: 12px 16px;
+  margin: 6px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+
+  
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hover effect */
 li:hover {
   background: #222;
 }
 
-
+/* Active / playing song */
 li.active {
   background: #1db954;
   color: black;
   font-weight: bold;
+}
+
+/* Audio player spacing */
+#audio {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 700px;
 }
