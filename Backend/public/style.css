@@ -28,35 +28,99 @@ h1 {
 }
 
 /* Individual song item */
-li {
+#songs li {
   list-style: none;
   padding: 12px 16px;
   margin: 6px 0;
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  
+  /* handle long names */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 /* Hover effect */
-li:hover {
+#songs li:hover {
   background: #222;
 }
 
 /* Active / playing song */
-li.active {
+#songs li.active {
   background: #1db954;
   color: black;
   font-weight: bold;
 }
 
-/* Audio player spacing */
+/* Add-to-playlist button */
+#songs li button {
+  background: transparent;
+  border: 1px solid #555;
+  color: #ccc;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#songs li button:hover {
+  background: #333;
+  color: white;
+}
+
+/* Audio player */
 #audio {
   margin-top: 20px;
   width: 100%;
   max-width: 700px;
+}
+
+/* ---------------- PLAYLIST UI ---------------- */
+
+#playlists {
+  padding: 0;
+  margin-top: 10px;
+  max-width: 400px;
+}
+
+#playlists li {
+  list-style: none;
+  padding: 10px 14px;
+  margin: 6px 0;
+  border-radius: 8px;
+  background: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#playlists li:hover {
+  background: #2a2a2a;
+}
+
+/* Playlist input + button */
+#playlistName {
+  padding: 8px;
+  width: 220px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+}
+
+#createPlaylist {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #1db954;
+  color: black;
+  font-weight: bold;
+}
+
+#createPlaylist:hover {
+  background: #1ed760;
 }
