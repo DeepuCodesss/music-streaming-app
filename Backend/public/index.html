@@ -17,18 +17,20 @@
   </header>
 
   <!-- TABS -->
- <nav class="tabs">
-  <button class="tab active" data-tab="home">Home</button>
-  <button class="tab" data-tab="playlists">Playlists</button>
-  <button class="tab" data-tab="account">Account</button>
-</nav>
-
+  <nav class="tabs">
+    <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="playlists">Playlists</button>
+    <button class="tab" data-tab="account">Account</button>
+  </nav>
 
   <!-- ================= HOME TAB ================= -->
   <section id="home" class="tab-content active">
 
     <!-- SEARCH -->
-    <input id="search" type="text" placeholder="Search songs..." />
+    <input id="search" type="text" placeholder="Search songs or YouTube..." />
+
+    <!-- 🔴 YOUTUBE RESULTS (REQUIRED) -->
+    <ul id="youtubeResults"></ul>
 
     <h3>Songs</h3>
     <ul id="songs"></ul>
@@ -62,32 +64,33 @@
 
   <!-- ================= STICKY MINI PLAYER ================= -->
   <div id="miniPlayer">
+
     <div id="miniInfo">
       <span id="miniTitle">No song playing</span>
     </div>
 
-   <div id="miniControls">
-  <button id="prevBtn">⏮</button>
-  <button id="playPauseBtn">⏯</button>
-  <button id="nextBtn">⏭</button>
+    <div id="miniControls">
+      <button id="prevBtn">⏮</button>
+      <button id="playPauseBtn">⏯</button>
+      <button id="nextBtn">⏭</button>
 
-  <button id="shuffleBtn">🔀</button>
-  <button id="repeatBtn">🔁</button>
+      <button id="shuffleBtn">🔀</button>
+      <button id="repeatBtn">🔁</button>
 
-  <!-- 🔊 VOLUME -->
-  <input
-    type="range"
-    id="volumeSlider"
-    min="0"
-    max="100"
-    value="70"
-    title="Volume"
-  />
-</div>
+      <!-- 🔊 VOLUME -->
+      <input
+        type="range"
+        id="volumeSlider"
+        min="0"
+        max="100"
+        value="70"
+        title="Volume"
+      />
+    </div>
 
-
-    <!-- AUDIO (GLOBAL) -->
+    <!-- AUDIO (GLOBAL PLAYER) -->
     <audio id="audio"></audio>
+
   </div>
 
   <!-- FOOTER -->
