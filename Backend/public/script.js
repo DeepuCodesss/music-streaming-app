@@ -1,4 +1,5 @@
 // ---------- TAB NAV ----------
+const miniTitle = document.getElementById("miniTitle");
 const tabs = document.querySelectorAll(".tab");
 const contents = document.querySelectorAll(".tab-content");
 
@@ -80,7 +81,7 @@ function renderSongs() {
   });
 }
 
-// ---------- PLAY / PAUSE / STOP ----------
+// ---------- PLAY SONG ----------
 function playSong(song, li, index) {
   currentIndex = index;
 
@@ -115,6 +116,9 @@ function playSong(song, li, index) {
 
   li.classList.add("active");
   li.firstChild.textContent = "⏸ " + song.title;
+
+  // ✅ UPDATE MINI PLAYER TITLE
+  if (miniTitle) miniTitle.textContent = song.title;
 }
 
 // ---------- SEARCH ----------
@@ -124,6 +128,7 @@ searchInput.oninput = () => {
     s.title.toLowerCase().includes(searchInput.value.toLowerCase())
   );
   visibleCount = 20;
+  currentIndex = -1;
   renderSongs();
 };
 
@@ -145,22 +150,35 @@ audio.addEventListener("ended", () => {
     return;
   }
 
-  let nextIndex;
+  playNext();
+});
+
+function playNext() {
+  if (!filteredSongs.length) return;
 
   if (isShuffle) {
-    nextIndex = Math.floor(Math.random() * filteredSongs.length);
+    currentIndex = Math.floor(Math.random() * filteredSongs.length);
   } else {
-    nextIndex = currentIndex + 1;
+    currentIndex++;
   }
 
-  if (nextIndex < filteredSongs.length) {
-    const nextLi = songsList.children[nextIndex];
-    if (nextLi) nextLi.click();
+  if (currentIndex < filteredSongs.length) {
+    const li = songsList.children[currentIndex];
+    if (li) li.click();
   } else if (repeatMode === 1) {
-    const firstLi = songsList.children[0];
-    if (firstLi) firstLi.click();
+    currentIndex = 0;
+    const li = songsList.children[0];
+    if (li) li.click();
   }
-});
+}
+
+function playPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    const li = songsList.children[currentIndex];
+    if (li) li.click();
+  }
+}
 
 // ---------- CONTROLS ----------
 playPauseBtn.onclick = () => {
@@ -177,19 +195,8 @@ playPauseBtn.onclick = () => {
   }
 };
 
-nextBtn.onclick = () => {
-  if (currentIndex + 1 < filteredSongs.length) {
-    const li = songsList.children[currentIndex + 1];
-    if (li) li.click();
-  }
-};
-
-prevBtn.onclick = () => {
-  if (currentIndex > 0) {
-    const li = songsList.children[currentIndex - 1];
-    if (li) li.click();
-  }
-};
+nextBtn.onclick = playNext;
+prevBtn.onclick = playPrev;
 
 shuffleBtn.onclick = () => {
   isShuffle = !isShuffle;
@@ -230,6 +237,7 @@ function removeSong(index) {
   save();
   filteredSongs = playlists[activePlaylist];
   visibleCount = filteredSongs.length;
+  currentIndex = -1;
   renderSongs();
 }
 
@@ -245,6 +253,7 @@ function renderPlaylists() {
       activePlaylist = name;
       filteredSongs = playlists[name];
       visibleCount = filteredSongs.length;
+      currentIndex = -1;
       renderSongs();
     };
 

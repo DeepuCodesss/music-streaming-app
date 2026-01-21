@@ -17,11 +17,12 @@
   </header>
 
   <!-- TABS -->
-  <nav class="tabs">
-    <button class="tab active" data-tab="home">Home</button>
-    <button class="tab" data-tab="playlists">Playlists</button>
-    <button class="tab" data-tab="account">Account</button>
-  </nav>
+ <nav class="tabs">
+  <button class="tab active" data-tab="home">Home</button>
+  <button class="tab" data-tab="playlists">Playlists</button>
+  <button class="tab" data-tab="account">Account</button>
+</nav>
+
 
   <!-- ================= HOME TAB ================= -->
   <section id="home" class="tab-content active">
@@ -31,19 +32,6 @@
 
     <h3>Songs</h3>
     <ul id="songs"></ul>
-
-    <!-- 🎛 PLAYER CONTROLS (REQUIRED FOR JS) -->
-    <div id="playerControls">
-      <button id="prevBtn">⏮</button>
-      <button id="playPauseBtn">⏯</button>
-      <button id="nextBtn">⏭</button>
-
-      <button id="shuffleBtn" title="Shuffle">🔀</button>
-      <button id="repeatBtn" title="Repeat">🔁</button>
-    </div>
-
-    <!-- AUDIO -->
-    <audio id="audio" controls></audio>
 
   </section>
 
@@ -71,6 +59,24 @@
     <h3>👤 Account</h3>
     <p>Login & profile coming soon.</p>
   </section>
+
+  <!-- ================= STICKY MINI PLAYER ================= -->
+  <div id="miniPlayer">
+    <div id="miniInfo">
+      <span id="miniTitle">No song playing</span>
+    </div>
+
+    <div id="miniControls">
+      <button id="prevBtn">⏮</button>
+      <button id="playPauseBtn">⏯</button>
+      <button id="nextBtn">⏭</button>
+      <button id="shuffleBtn">🔀</button>
+      <button id="repeatBtn">🔁</button>
+    </div>
+
+    <!-- AUDIO (GLOBAL) -->
+    <audio id="audio"></audio>
+  </div>
 
   <!-- FOOTER -->
   <footer>
