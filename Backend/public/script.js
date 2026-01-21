@@ -8,9 +8,10 @@ let filteredSongs = [];
 let currentSongFile = null;
 let currentLi = null;
 
-// pagination state
-let currentPage = 1;
-const PAGE_SIZE = 20;
+// infinite scroll state
+let visibleCount = 20;
+const LOAD_SIZE = 20;
+let isLoading = false;
 
 // fetch songs
 fetch("/songs-list")
@@ -18,19 +19,16 @@ fetch("/songs-list")
   .then(songs => {
     allSongs = songs;
     filteredSongs = songs;
-    renderPage();
-    renderPaginationControls();
+    renderSongs();
   });
 
-// render only ONE PAGE
-function renderPage() {
+// render songs up to visibleCount
+function renderSongs() {
   songsList.innerHTML = "";
 
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const pageSongs = filteredSongs.slice(start, end);
+  const songsToShow = filteredSongs.slice(0, visibleCount);
 
-  pageSongs.forEach(song => {
+  songsToShow.forEach(song => {
     const li = document.createElement("li");
     li.textContent = "▶ " + song.title;
 
@@ -68,51 +66,27 @@ function renderPage() {
   });
 }
 
-// pagination buttons
-function renderPaginationControls() {
-  let controls = document.getElementById("pagination");
+// infinite scroll listener
+window.addEventListener("scroll", () => {
+  if (isLoading) return;
 
-  if (!controls) {
-    controls = document.createElement("div");
-    controls.id = "pagination";
-    controls.style.marginTop = "20px";
-    controls.style.display = "flex";
-    controls.style.gap = "10px";
-    songsList.after(controls);
+  const nearBottom =
+    window.innerHeight + window.scrollY >=
+    document.body.offsetHeight - 200;
+
+  if (nearBottom && visibleCount < filteredSongs.length) {
+    isLoading = true;
+
+    // simulate smooth loading
+    setTimeout(() => {
+      visibleCount += LOAD_SIZE;
+      renderSongs();
+      isLoading = false;
+    }, 300);
   }
+});
 
-  controls.innerHTML = "";
-
-  const totalPages = Math.ceil(filteredSongs.length / PAGE_SIZE);
-
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "⬅ Previous";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.onclick = () => {
-    currentPage--;
-    renderPage();
-    renderPaginationControls();
-  };
-
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Next ➡";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.onclick = () => {
-    currentPage++;
-    renderPage();
-    renderPaginationControls();
-  };
-
-  const pageInfo = document.createElement("span");
-  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  pageInfo.style.alignSelf = "center";
-
-  controls.appendChild(prevBtn);
-  controls.appendChild(pageInfo);
-  controls.appendChild(nextBtn);
-}
-
-// search logic (works with pagination)
+// search logic (resets infinite scroll)
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
 
@@ -120,9 +94,8 @@ searchInput.addEventListener("input", () => {
     song.title.toLowerCase().includes(query)
   );
 
-  currentPage = 1;
-  renderPage();
-  renderPaginationControls();
+  visibleCount = 20;
+  renderSongs();
 });
 
 // reset UI when song ends
