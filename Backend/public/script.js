@@ -2,27 +2,35 @@ const audio = document.getElementById("audio");
 const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
 
+const playlistInput = document.getElementById("playlistName");
+const createPlaylistBtn = document.getElementById("createPlaylist");
+const playlistsList = document.getElementById("playlists");
+
 let allSongs = [];
 let filteredSongs = [];
 
 let currentSongFile = null;
 let currentLi = null;
 
-// infinite scroll state
+// infinite scroll
 let visibleCount = 20;
 const LOAD_SIZE = 20;
 let isLoading = false;
 
-// fetch songs
+// playlists (stored locally)
+let playlists = JSON.parse(localStorage.getItem("playlists")) || {};
+
+// ---------------- FETCH SONGS ----------------
 fetch("/songs-list")
   .then(res => res.json())
   .then(songs => {
     allSongs = songs;
     filteredSongs = songs;
     renderSongs();
+    renderPlaylists();
   });
 
-// render songs up to visibleCount
+// ---------------- RENDER SONGS ----------------
 function renderSongs() {
   songsList.innerHTML = "";
 
@@ -32,52 +40,61 @@ function renderSongs() {
     const li = document.createElement("li");
     li.textContent = "▶ " + song.title;
 
-    li.onclick = () => {
-      // SAME SONG → TOGGLE PLAY / PAUSE
-      if (currentSongFile === song.file) {
-        if (audio.paused) {
-          audio.play();
-          li.textContent = "⏸ " + song.title;
-        } else {
-          audio.pause();
-          li.textContent = "▶ " + song.title;
-        }
-        return;
-      }
-
-      // NEW SONG → SWITCH
-      if (currentLi) {
-        currentLi.classList.remove("active");
-        currentLi.textContent =
-          "▶ " + currentLi.textContent.replace("▶ ", "").replace("⏸ ", "");
-      }
-
-      currentSongFile = song.file;
-      currentLi = li;
-
-      li.classList.add("active");
-      li.textContent = "⏸ " + song.title;
-
-      audio.src = `/songs/${song.file}`;
-      audio.play();
+    // add to playlist button
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "+";
+    addBtn.style.marginLeft = "10px";
+    addBtn.onclick = (e) => {
+      e.stopPropagation();
+      addSongToPlaylist(song);
     };
+
+    li.appendChild(addBtn);
+
+    li.onclick = () => playSong(song, li);
 
     songsList.appendChild(li);
   });
 }
 
-// infinite scroll listener
+// ---------------- PLAY SONG ----------------
+function playSong(song, li) {
+  if (currentSongFile === song.file) {
+    if (audio.paused) {
+      audio.play();
+      li.firstChild.textContent = "⏸ " + song.title;
+    } else {
+      audio.pause();
+      li.firstChild.textContent = "▶ " + song.title;
+    }
+    return;
+  }
+
+  if (currentLi) {
+    currentLi.classList.remove("active");
+    currentLi.firstChild.textContent =
+      "▶ " + currentLi.firstChild.textContent.replace("▶ ", "").replace("⏸ ", "");
+  }
+
+  currentSongFile = song.file;
+  currentLi = li;
+
+  li.classList.add("active");
+  li.firstChild.textContent = "⏸ " + song.title;
+
+  audio.src = `/songs/${song.file}`;
+  audio.play();
+}
+
+// ---------------- INFINITE SCROLL ----------------
 window.addEventListener("scroll", () => {
   if (isLoading) return;
 
   const nearBottom =
-    window.innerHeight + window.scrollY >=
-    document.body.offsetHeight - 200;
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
 
   if (nearBottom && visibleCount < filteredSongs.length) {
     isLoading = true;
-
-    // simulate smooth loading
     setTimeout(() => {
       visibleCount += LOAD_SIZE;
       renderSongs();
@@ -86,24 +103,64 @@ window.addEventListener("scroll", () => {
   }
 });
 
-// search logic (resets infinite scroll)
+// ---------------- SEARCH ----------------
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
-
   filteredSongs = allSongs.filter(song =>
     song.title.toLowerCase().includes(query)
   );
-
   visibleCount = 20;
   renderSongs();
 });
 
-// reset UI when song ends
+// ---------------- PLAYLIST LOGIC ----------------
+createPlaylistBtn.onclick = () => {
+  const name = playlistInput.value.trim();
+  if (!name || playlists[name]) return;
+
+  playlists[name] = [];
+  savePlaylists();
+  playlistInput.value = "";
+  renderPlaylists();
+};
+
+function addSongToPlaylist(song) {
+  const name = prompt("Add to which playlist?");
+  if (!name || !playlists[name]) return;
+
+  playlists[name].push(song);
+  savePlaylists();
+  alert(`Added to "${name}"`);
+}
+
+function renderPlaylists() {
+  playlistsList.innerHTML = "";
+
+  Object.keys(playlists).forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
+    li.style.cursor = "pointer";
+
+    li.onclick = () => {
+      filteredSongs = playlists[name];
+      visibleCount = filteredSongs.length;
+      renderSongs();
+    };
+
+    playlistsList.appendChild(li);
+  });
+}
+
+function savePlaylists() {
+  localStorage.setItem("playlists", JSON.stringify(playlists));
+}
+
+// ---------------- AUDIO END ----------------
 audio.addEventListener("ended", () => {
   if (currentLi) {
     currentLi.classList.remove("active");
-    currentLi.textContent =
-      "▶ " + currentLi.textContent.replace("⏸ ", "").replace("▶ ", "");
+    currentLi.firstChild.textContent =
+      "▶ " + currentLi.firstChild.textContent.replace("⏸ ", "").replace("▶ ", "");
   }
   currentSongFile = null;
   currentLi = null;
