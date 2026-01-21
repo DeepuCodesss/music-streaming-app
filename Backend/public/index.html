@@ -34,14 +34,18 @@
     type="text"
     id="playlistName"
     placeholder="New playlist name"
-    style="padding:8px; width:220px;"
   />
-  <button id="createPlaylist" style="padding:8px; margin-left:6px;">
-    Create
-  </button>
+  <button id="createPlaylist">Create</button>
+
+  <!-- Select playlist -->
+  <div style="margin-top:15px;">
+    <select id="playlistSelect">
+      <option value="">Select playlist</option>
+    </select>
+  </div>
 
   <!-- Playlist list -->
-  <ul id="playlists" style="margin-top:15px;"></ul>
+  <ul id="playlists"></ul>
 
   <!-- 🔽 Footer -->
   <footer style="margin-top:40px; font-size:13px; color:gray;">
