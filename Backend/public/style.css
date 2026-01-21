@@ -1,126 +1,163 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-  padding: 20px;
-}
-
-/* Title */
-h1 {
-  margin-bottom: 12px;
-}
-
-/* Search box */
-#search {
-  padding: 10px;
-  width: 260px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-}
-
-/* Song list container */
-#songs {
-  padding: 0;
   margin: 0;
-  max-width: 700px;
+  font-family: system-ui, sans-serif;
+  background: #121212;
+  color: white;
 }
 
-/* Individual song item */
-#songs li {
-  list-style: none;
-  padding: 12px 16px;
-  margin: 6px 0;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.2s;
+/* layout */
+body > * {
+  max-width: 900px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+h1 {
+  margin: 20px 0;
+}
+
+h3 {
+  margin: 20px 0 10px;
+}
+
+/* search */
+#search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+}
+
+/* tabs */
+.tabs {
   display: flex;
-  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+  font-weight: bold;
+}
+
+.tab.active {
+  background: #1db954;
+  color: black;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* songs */
+#songs {
+  list-style: none;
+  padding: 0;
+}
+
+#songs li {
+  background: #181818;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  display: flex;
   justify-content: space-between;
-
-  /* handle long names */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  align-items: center;
+  cursor: pointer;
 }
 
-/* Hover effect */
-#songs li:hover {
-  background: #222;
-}
-
-/* Active / playing song */
 #songs li.active {
   background: #1db954;
   color: black;
   font-weight: bold;
 }
 
-/* Add-to-playlist button */
 #songs li button {
-  background: transparent;
   border: 1px solid #555;
+  background: transparent;
   color: #ccc;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
+  border-radius: 999px;
+  padding: 6px 10px;
 }
 
-#songs li button:hover {
-  background: #333;
+/* audio */
+#audio {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* playlists */
+#playlistName,
+#playlistSelect {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 999px;
+  border: none;
+  background: #2a2a2a;
   color: white;
 }
 
-/* Audio player */
-#audio {
-  margin-top: 20px;
-  width: 100%;
-  max-width: 700px;
-}
-
-/* ---------------- PLAYLIST UI ---------------- */
-
-#playlists {
-  padding: 0;
-  margin-top: 10px;
-  max-width: 400px;
-}
-
-#playlists li {
-  list-style: none;
-  padding: 10px 14px;
-  margin: 6px 0;
-  border-radius: 8px;
-  background: #1a1a1a;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#playlists li:hover {
-  background: #2a2a2a;
-}
-
-/* Playlist input + button */
-#playlistName {
-  padding: 8px;
-  width: 220px;
-  border-radius: 6px;
-  border: none;
-  outline: none;
-}
-
 #createPlaylist {
-  padding: 8px 12px;
-  border-radius: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 999px;
   border: none;
-  cursor: pointer;
   background: #1db954;
-  color: black;
   font-weight: bold;
 }
 
-#createPlaylist:hover {
-  background: #1ed760;
+#playlists {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+#playlists li {
+  background: #181818;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* footer */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin: 40px 0 20px;
+}
+
+/* mobile bottom tabs */
+@media (max-width: 600px) {
+  .tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #121212;
+    padding: 10px;
+    border-top: 1px solid #222;
+  }
+
+  body {
+    padding-bottom: 80px;
+  }
 }

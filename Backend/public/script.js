@@ -1,3 +1,20 @@
+// ---------- TAB NAV ----------
+const tabs = document.querySelectorAll(".tab");
+const contents = document.querySelectorAll(".tab-content");
+
+tabs.forEach(tab => {
+  tab.onclick = () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    contents.forEach(c => c.classList.remove("active"));
+
+    tab.classList.add("active");
+    const id =
+      tab.dataset.tab === "playlists" ? "playlistsTab" : tab.dataset.tab;
+    document.getElementById(id).classList.add("active");
+  };
+});
+
+// ---------- MUSIC LOGIC ----------
 const audio = document.getElementById("audio");
 const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
@@ -9,53 +26,38 @@ const playlistSelect = document.getElementById("playlistSelect");
 
 let allSongs = [];
 let filteredSongs = [];
-
-let currentSongFile = null;
-let currentLi = null;
-
-// infinite scroll
-let visibleCount = 20;
-const LOAD_SIZE = 20;
-let isLoading = false;
-
-// playlists (localStorage)
 let playlists = JSON.parse(localStorage.getItem("playlists")) || {};
 let activePlaylist = null;
 
-// ---------------- FETCH SONGS ----------------
+let currentSongFile = null;
+let currentLi = null;
+let visibleCount = 20;
+
+// ---------- FETCH SONGS ----------
 fetch("/songs-list")
   .then(res => res.json())
-  .then(songs => {
-    allSongs = songs;
-    filteredSongs = songs;
+  .then(data => {
+    allSongs = data;
+    filteredSongs = data;
     renderSongs();
     renderPlaylists();
-    renderPlaylistDropdown();
+    renderDropdown();
   });
 
-// ---------------- RENDER SONGS ----------------
+// ---------- RENDER SONGS ----------
 function renderSongs() {
   songsList.innerHTML = "";
 
-  filteredSongs.slice(0, visibleCount).forEach((song, index) => {
+  filteredSongs.slice(0, visibleCount).forEach((song, i) => {
     const li = document.createElement("li");
     li.textContent = "▶ " + song.title;
 
     const btn = document.createElement("button");
-
-    if (activePlaylist) {
-      btn.textContent = "❌";
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        removeSongFromPlaylist(index);
-      };
-    } else {
-      btn.textContent = "+";
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        addSongToSelectedPlaylist(song);
-      };
-    }
+    btn.textContent = activePlaylist ? "❌" : "+";
+    btn.onclick = e => {
+      e.stopPropagation();
+      activePlaylist ? removeSong(i) : addToPlaylist(song);
+    };
 
     li.appendChild(btn);
     li.onclick = () => playSong(song, li);
@@ -63,105 +65,98 @@ function renderSongs() {
   });
 }
 
-// ---------------- PLAY SONG ----------------
+// ---------- PLAY / PAUSE / STOP LOGIC ----------
 function playSong(song, li) {
+  // SAME SONG → TOGGLE PLAY / PAUSE
   if (currentSongFile === song.file) {
     if (audio.paused) {
       audio.play();
+      li.classList.add("active");
       li.firstChild.textContent = "⏸ " + song.title;
     } else {
       audio.pause();
+      li.classList.remove("active");
       li.firstChild.textContent = "▶ " + song.title;
     }
     return;
   }
 
+  // DIFFERENT SONG → STOP OLD
   if (currentLi) {
     currentLi.classList.remove("active");
     currentLi.firstChild.textContent =
-      "▶ " + currentLi.firstChild.textContent.replace("▶ ", "").replace("⏸ ", "");
+      "▶ " +
+      currentLi.firstChild.textContent.replace("▶ ", "").replace("⏸ ", "");
   }
 
   currentSongFile = song.file;
   currentLi = li;
-  li.classList.add("active");
-  li.firstChild.textContent = "⏸ " + song.title;
 
   audio.src = `/songs/${song.file}`;
+  audio.currentTime = 0;
   audio.play();
+
+  li.classList.add("active");
+  li.firstChild.textContent = "⏸ " + song.title;
 }
 
-// ---------------- INFINITE SCROLL ----------------
+// ---------- SEARCH ----------
+searchInput.oninput = () => {
+  activePlaylist = null;
+  filteredSongs = allSongs.filter(s =>
+    s.title.toLowerCase().includes(searchInput.value.toLowerCase())
+  );
+  visibleCount = 20;
+  renderSongs();
+};
+
+// ---------- INFINITE SCROLL ----------
 window.addEventListener("scroll", () => {
-  if (isLoading || activePlaylist) return;
+  if (activePlaylist) return;
 
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-    if (visibleCount < filteredSongs.length) {
-      isLoading = true;
-      setTimeout(() => {
-        visibleCount += LOAD_SIZE;
-        renderSongs();
-        isLoading = false;
-      }, 300);
-    }
+    visibleCount += 20;
+    renderSongs();
   }
 });
 
-// ---------------- SEARCH ----------------
-searchInput.addEventListener("input", () => {
-  const q = searchInput.value.toLowerCase();
-  activePlaylist = null;
-  filteredSongs = allSongs.filter(s => s.title.toLowerCase().includes(q));
-  visibleCount = 20;
-  renderSongs();
+// ---------- AUTO PLAY NEXT SONG ----------
+audio.addEventListener("ended", () => {
+  if (!currentLi) return;
+
+  const nextLi = currentLi.nextElementSibling;
+  if (nextLi) {
+    nextLi.click(); // autoplay next
+  } else {
+    currentSongFile = null;
+    currentLi = null;
+  }
 });
 
-// ---------------- PLAYLIST LOGIC ----------------
+// ---------- PLAYLISTS ----------
 createPlaylistBtn.onclick = () => {
   const name = playlistInput.value.trim();
   if (!name || playlists[name]) return;
 
   playlists[name] = [];
-  savePlaylists();
+  save();
   playlistInput.value = "";
   renderPlaylists();
-  renderPlaylistDropdown();
+  renderDropdown();
 };
 
-function addSongToSelectedPlaylist(song) {
+function addToPlaylist(song) {
   const name = playlistSelect.value;
-  if (!name) {
-    alert("Select a playlist first");
-    return;
-  }
+  if (!name) return alert("Select playlist");
   playlists[name].push(song);
-  savePlaylists();
+  save();
 }
 
-function removeSongFromPlaylist(index) {
-  playlists[activePlaylist].splice(index, 1);
-  savePlaylists();
+function removeSong(i) {
+  playlists[activePlaylist].splice(i, 1);
+  save();
   filteredSongs = playlists[activePlaylist];
-  visibleCount = filteredSongs.length;
   renderSongs();
-}
-
-// 🗑 DELETE ENTIRE PLAYLIST
-function deletePlaylist(name) {
-  if (!confirm(`Delete playlist "${name}"?`)) return;
-
-  delete playlists[name];
-  savePlaylists();
-
-  if (activePlaylist === name) {
-    activePlaylist = null;
-    filteredSongs = allSongs;
-    visibleCount = 20;
-    renderSongs();
-  }
-
-  renderPlaylists();
-  renderPlaylistDropdown();
 }
 
 function renderPlaylists() {
@@ -169,54 +164,45 @@ function renderPlaylists() {
 
   Object.keys(playlists).forEach(name => {
     const li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.justifyContent = "space-between";
-    li.style.alignItems = "center";
 
     const span = document.createElement("span");
     span.textContent = name;
-    span.style.cursor = "pointer";
     span.onclick = () => {
       activePlaylist = name;
       filteredSongs = playlists[name];
-      visibleCount = filteredSongs.length;
+      visibleCount = playlists[name].length;
       renderSongs();
     };
 
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "🗑";
-    delBtn.onclick = (e) => {
-      e.stopPropagation();
-      deletePlaylist(name);
+    const del = document.createElement("button");
+    del.textContent = "🗑";
+    del.onclick = () => {
+      if (confirm("Delete playlist?")) {
+        delete playlists[name];
+        activePlaylist = null;
+        filteredSongs = allSongs;
+        save();
+        renderPlaylists();
+        renderDropdown();
+        renderSongs();
+      }
     };
 
-    li.appendChild(span);
-    li.appendChild(delBtn);
+    li.append(span, del);
     playlistsList.appendChild(li);
   });
 }
 
-function renderPlaylistDropdown() {
+function renderDropdown() {
   playlistSelect.innerHTML = `<option value="">Select playlist</option>`;
-  Object.keys(playlists).forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    playlistSelect.appendChild(opt);
+  Object.keys(playlists).forEach(p => {
+    const o = document.createElement("option");
+    o.value = p;
+    o.textContent = p;
+    playlistSelect.appendChild(o);
   });
 }
 
-function savePlaylists() {
+function save() {
   localStorage.setItem("playlists", JSON.stringify(playlists));
 }
-
-// ---------------- AUDIO END ----------------
-audio.addEventListener("ended", () => {
-  if (currentLi) {
-    currentLi.classList.remove("active");
-    currentLi.firstChild.textContent =
-      "▶ " + currentLi.firstChild.textContent.replace("⏸ ", "").replace("▶ ", "");
-  }
-  currentSongFile = null;
-  currentLi = null;
-});

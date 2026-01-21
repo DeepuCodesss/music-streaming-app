@@ -1,58 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🎧 POTIFY</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- MOBILE FIX -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>🎧 POTIFY</h1>
+  <!-- HEADER -->
+  <header>
+    <h1>🎧 POTIFY</h1>
+  </header>
 
-  <!-- 🔍 Search -->
-  <input
-    type="text"
-    id="search"
-    placeholder="Search songs..."
-    style="padding:8px; width:220px; margin-bottom:12px;"
-  />
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="playlists">Playlists</button>
+    <button class="tab" data-tab="account">Account</button>
+  </nav>
 
-  <!-- 🎶 Songs -->
-  <h3>Songs</h3>
-  <ul id="songs"></ul>
+  <!-- HOME TAB -->
+  <section id="home" class="tab-content active">
+    <input id="search" type="text" placeholder="Search songs..." />
 
-  <!-- 🎧 Player -->
-  <audio id="audio" controls></audio>
+    <h3>Songs</h3>
+    <ul id="songs"></ul>
 
-  <!-- 📂 PLAYLIST SECTION -->
-  <hr style="margin:30px 0; opacity:0.3">
+    <audio id="audio" controls></audio>
+  </section>
 
-  <h3>📂 Playlists</h3>
+  <!-- PLAYLIST TAB -->
+  <section id="playlistsTab" class="tab-content">
+    <h3>📂 Playlists</h3>
 
-  <!-- Create playlist -->
-  <input
-    type="text"
-    id="playlistName"
-    placeholder="New playlist name"
-  />
-  <button id="createPlaylist">Create</button>
+    <input id="playlistName" type="text" placeholder="New playlist name" />
+    <button id="createPlaylist">Create</button>
 
-  <!-- Select playlist -->
-  <div style="margin-top:15px;">
     <select id="playlistSelect">
       <option value="">Select playlist</option>
     </select>
-  </div>
 
-  <!-- Playlist list -->
-  <ul id="playlists"></ul>
+    <ul id="playlists"></ul>
+  </section>
 
-  <!-- 🔽 Footer -->
-  <footer style="margin-top:40px; font-size:13px; color:gray;">
+  <!-- ACCOUNT TAB -->
+  <section id="account" class="tab-content">
+    <h3>👤 Account</h3>
+    <p>Login & profile coming soon.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
     <p>Made by <strong>Deepu</strong> & <strong>Harshit</strong></p>
-    <p style="font-size:12px;">
-      This project is for educational and demo purposes only.
-    </p>
+    <p>Educational project</p>
   </footer>
 
   <script src="script.js"></script>
