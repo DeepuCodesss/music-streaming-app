@@ -340,3 +340,96 @@ async function searchYouTube(query) {
     console.error("YouTube error", e);
   }
 }
+/*************************************************
+ * INTERNET ARCHIVE (NO API KEY REQUIRED)
+ *************************************************/
+const archiveSearchInput = document.getElementById("archiveSearch");
+const archiveSongs = document.getElementById("archiveSongs");
+
+if (archiveSearchInput) {
+  archiveSearchInput.addEventListener("input", () => {
+    const q = archiveSearchInput.value.trim();
+    if (q.length > 2) searchArchive(q);
+  });
+}
+
+async function searchArchive(query) {
+  archiveSongs.innerHTML = "<li>Searching...</li>";
+
+  const searchUrl =
+    "https://archive.org/advancedsearch.php" +
+    "?q=" + encodeURIComponent(query + " AND mediatype:audio") +
+    "&fl[]=identifier&fl[]=title&fl[]=creator" +
+    "&rows=20&output=json";
+
+  try {
+    const res = await fetch(searchUrl);
+    const data = await res.json();
+
+    archiveSongs.innerHTML = "";
+
+    for (const doc of data.response.docs) {
+      loadArchiveItem(doc);
+    }
+  } catch (err) {
+    archiveSongs.innerHTML = "<li>Error loading results</li>";
+  }
+}
+
+async function loadArchiveItem(item) {
+  const metaUrl = `https://archive.org/metadata/${item.identifier}`;
+  const res = await fetch(metaUrl);
+  const meta = await res.json();
+
+  if (!meta.files) return;
+
+  const audioFile = meta.files.find(f =>
+    f.format && f.format.toLowerCase().includes("mp3")
+  );
+
+  if (!audioFile) return;
+
+  const li = document.createElement("li");
+  li.innerHTML = `
+    ▶ <strong>${item.title || "Unknown title"}</strong><br>
+    <small>${item.creator || "Unknown artist"} • Internet Archive</small>
+  `;
+
+  li.onclick = () => {
+    audio.src = `https://archive.org/download/${item.identifier}/${audioFile.name}`;
+    audio.play();
+    if (miniTitle) miniTitle.textContent = item.title || "Internet Archive";
+  };
+
+  archiveSongs.appendChild(li);
+}
+/*************************************************
+ * LOAD DEFAULT ARCHIVE SONGS
+ *************************************************/
+window.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("archiveSongs")) {
+    loadDefaultArchive();
+  }
+});
+
+async function loadDefaultArchive() {
+  const archiveSongs = document.getElementById("archiveSongs");
+  archiveSongs.innerHTML = "<li>Loading free music…</li>";
+
+  const url =
+    "https://archive.org/advancedsearch.php" +
+    "?q=collection:(opensource_audio OR netlabels)" +
+    "&fl[]=identifier&fl[]=title&fl[]=creator" +
+    "&rows=20&output=json";
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    archiveSongs.innerHTML = "";
+    data.response.docs.forEach(loadArchiveItem);
+  } catch {
+    archiveSongs.innerHTML = "<li>Unable to load archive music</li>";
+  }
+}
+

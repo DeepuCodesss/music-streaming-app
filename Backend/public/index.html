@@ -19,6 +19,7 @@
   <!-- TABS -->
   <nav class="tabs">
     <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="archive">Archive</button>
     <button class="tab" data-tab="playlists">Playlists</button>
     <button class="tab" data-tab="account">Account</button>
   </nav>
@@ -27,18 +28,42 @@
   <section id="home" class="tab-content active">
 
     <!-- SEARCH -->
-    <input id="search" type="text" placeholder="Search songs or YouTube..." />
+    <input
+      id="search"
+      type="text"
+      placeholder="Search local songs or YouTube..."
+    />
 
-    <!-- 🔴 YOUTUBE RESULTS (REQUIRED) -->
+    <!-- 🔴 YOUTUBE RESULTS -->
     <ul id="youtubeResults"></ul>
 
-    <h3>Songs</h3>
+    <h3>Local Songs</h3>
     <ul id="songs"></ul>
+
+  </section>
+
+  <!-- ================= ARCHIVE TAB ================= -->
+  <section id="archive" class="tab-content">
+
+    <h3>🌍 Internet Archive</h3>
+
+    <input
+      id="archiveSearch"
+      type="text"
+      placeholder="Search millions of free songs..."
+    />
+
+    <ul id="archiveSongs"></ul>
+
+    <p style="font-size:12px;opacity:0.7;margin-top:10px;">
+      Source: Internet Archive • Public Domain / Creative Commons
+    </p>
 
   </section>
 
   <!-- ================= PLAYLIST TAB ================= -->
   <section id="playlistsTab" class="tab-content">
+
     <h3>📂 Playlists</h3>
 
     <input
@@ -54,6 +79,7 @@
     </select>
 
     <ul id="playlists"></ul>
+
   </section>
 
   <!-- ================= ACCOUNT TAB ================= -->
@@ -88,7 +114,7 @@
       />
     </div>
 
-    <!-- AUDIO (GLOBAL PLAYER) -->
+    <!-- GLOBAL AUDIO PLAYER -->
     <audio id="audio"></audio>
 
   </div>
