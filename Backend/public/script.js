@@ -35,6 +35,8 @@ const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
+const recentSongsList = document.getElementById("recentSongs");
+
 
 const youtubeResults = document.getElementById("youtubeResults");
 
@@ -58,6 +60,7 @@ let currentIndex = -1;
 let visibleCount = 20;
 let isShuffle = false;
 let repeatMode = 0; // 0 off | 1 repeat all | 2 repeat one
+let recentSongs = JSON.parse(localStorage.getItem("recentSongs")) || [];
 
 /*************************************************
  * FETCH LOCAL SONGS
@@ -137,6 +140,13 @@ function playSong(song, li, index) {
   li.firstChild.textContent = "⏸ " + song.title;
 
   if (miniTitle) miniTitle.textContent = song.title;
+
+addToRecent({
+  id: "local-" + song.file,
+  title: song.title,
+  url: `/songs/${song.file}`,
+  source: "Local Library"
+});
 }
 
 /*************************************************
@@ -395,11 +405,21 @@ async function loadArchiveItem(item) {
     <small>${item.creator || "Unknown artist"} • Internet Archive</small>
   `;
 
-  li.onclick = () => {
-    audio.src = `https://archive.org/download/${item.identifier}/${audioFile.name}`;
-    audio.play();
-    if (miniTitle) miniTitle.textContent = item.title || "Internet Archive";
-  };
+ li.onclick = () => {
+  const url = `https://archive.org/download/${item.identifier}/${audioFile.name}`;
+  audio.src = url;
+  audio.play();
+
+  if (miniTitle) miniTitle.textContent = item.title || "Internet Archive";
+
+  addToRecent({
+    id: "archive-" + item.identifier,
+    title: item.title || "Internet Archive",
+    url,
+    source: "Internet Archive"
+  });
+};
+
 
   archiveSongs.appendChild(li);
 }
@@ -420,7 +440,7 @@ async function loadDefaultArchive() {
     "https://archive.org/advancedsearch.php" +
     "?q=collection:(opensource_audio OR netlabels)" +
     "&fl[]=identifier&fl[]=title&fl[]=creator" +
-    "&rows=20&output=json";
+    "&rows=50&output=json";
 
   try {
     const res = await fetch(url);
@@ -432,4 +452,190 @@ async function loadDefaultArchive() {
     archiveSongs.innerHTML = "<li>Unable to load archive music</li>";
   }
 }
+
+/*************************************************
+ * ===== SAFE ADDITIONS (NO REMOVALS) =====
+ * Purpose:
+ * 1. Keep Home songs visible after Archive usage
+ * 2. Make Archive songs use SAME player state
+ *************************************************/
+
+/* ---------- RESTORE HOME SONGS WHEN TAB CHANGES ---------- */
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    if (tab.dataset.tab === "home") {
+      // restore local songs safely
+      filteredSongs = allSongs;
+      visibleCount = 20;
+      currentIndex = -1;
+      renderSongs();
+    }
+  });
+});
+
+/* ---------- ARCHIVE PLAY SHOULD INTEGRATE WITH PLAYER ---------- */
+/* override ONLY behavior on click, not existing logic */
+function playArchiveSongSafe(url, title) {
+  // reset local state safely
+  currentSongFile = url;
+  currentLi = null;
+  currentIndex = -1;
+
+  audio.src = url;
+  audio.currentTime = 0;
+  audio.play();
+
+  if (miniTitle) miniTitle.textContent = title || "Internet Archive";
+}
+
+/* ---------- PATCH ARCHIVE ITEM CLICK (NON-DESTRUCTIVE) ---------- */
+const __oldLoadArchiveItem = loadArchiveItem;
+
+loadArchiveItem = async function (item) {
+  const metaUrl = `https://archive.org/metadata/${item.identifier}`;
+  const res = await fetch(metaUrl);
+  const meta = await res.json();
+
+  if (!meta.files) return;
+
+  const audioFile = meta.files.find(f =>
+    f.format && f.format.toLowerCase().includes("mp3")
+  );
+
+  if (!audioFile) return;
+
+  const li = document.createElement("li");
+  li.innerHTML = `
+    ▶ <strong>${item.title || "Unknown title"}</strong><br>
+    <small>${item.creator || "Unknown artist"} • Internet Archive</small>
+  `;
+
+  li.onclick = () => {
+    playArchiveSongSafe(
+      `https://archive.org/download/${item.identifier}/${audioFile.name}`,
+      item.title || "Internet Archive"
+    );
+  };
+
+  archiveSongs.appendChild(li);
+};
+/*************************************************
+ * ===== ARCHIVE PLAYBACK FIX (SAFE ADDITION) =====
+ * Fixes: Archive songs not playing due to browser restrictions
+ *************************************************/
+
+function safePlayAudio(url, title) {
+  // stop anything currently playing
+  audio.pause();
+
+  // reset source
+  audio.src = url;
+  audio.load();
+
+  // update UI
+  if (miniTitle) miniTitle.textContent = title || "Internet Archive";
+
+  // force user‑gesture‑safe play
+  const playPromise = audio.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(err => {
+      console.warn("Autoplay blocked, retrying on user gesture");
+
+      // retry on next click anywhere
+      const retry = () => {
+        audio.play();
+        document.removeEventListener("click", retry);
+      };
+
+      document.addEventListener("click", retry);
+    });
+  }
+}
+
+/* ---------- PATCH ARCHIVE CLICK (NON‑DESTRUCTIVE) ---------- */
+const __originalLoadArchiveItem = loadArchiveItem;
+
+loadArchiveItem = async function (item) {
+  const metaUrl = `https://archive.org/metadata/${item.identifier}`;
+  const res = await fetch(metaUrl);
+  const meta = await res.json();
+
+  if (!meta.files) return;
+
+  const audioFile = meta.files.find(f =>
+    f.format && f.format.toLowerCase().includes("mp3")
+  );
+
+  if (!audioFile) return;
+
+  const li = document.createElement("li");
+  li.innerHTML = `
+    ▶ <strong>${item.title || "Unknown title"}</strong><br>
+    <small>${item.creator || "Unknown artist"} • Internet Archive</small>
+  `;
+
+  li.addEventListener("click", () => {
+    safePlayAudio(
+      `https://archive.org/download/${item.identifier}/${audioFile.name}`,
+      item.title || "Internet Archive"
+    );
+  });
+
+  archiveSongs.appendChild(li);
+};
+function addToRecent(songObj) {
+  // remove duplicates
+  recentSongs = recentSongs.filter(s => s.id !== songObj.id);
+
+  // add to top
+  recentSongs.unshift(songObj);
+
+  // limit to 20
+  if (recentSongs.length > 20) recentSongs.pop();
+
+  localStorage.setItem("recentSongs", JSON.stringify(recentSongs));
+  renderRecent();
+}
+
+function renderRecent() {
+  if (!recentSongsList) return;
+
+  recentSongsList.innerHTML = "";
+
+  if (recentSongs.length === 0) {
+    recentSongsList.innerHTML = "<li>No songs played yet</li>";
+    return;
+  }
+
+  recentSongs.forEach(song => {
+    const li = document.createElement("li");
+    li.innerHTML = `▶ <strong>${song.title}</strong><br>
+      <small>${song.source}</small>`;
+
+   li.onclick = () => {
+  currentSongFile = song.url;
+  currentLi = null;
+  currentIndex = -1;
+
+  audio.src = song.url;
+  audio.currentTime = 0;
+  audio.play();
+
+  if (miniTitle) miniTitle.textContent = song.title;
+};
+
+
+    recentSongsList.appendChild(li);
+  });
+}
+/*************************************************
+ * AUTO‑RENDER RECENTLY PLAYED ON LOAD
+ *************************************************/
+window.addEventListener("DOMContentLoaded", () => {
+  if (recentSongs && recentSongs.length > 0) {
+    renderRecent();
+  }
+});
+window.loadArchiveItem = loadArchiveItem;
 

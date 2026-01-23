@@ -7,54 +7,79 @@
   <!-- MOBILE FIX -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- MAIN STYLES -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <header>
     <h1>🎧 POTIFY</h1>
   </header>
 
-  <!-- TABS -->
+  <!-- ================= TAB NAVIGATION ================= -->
+  <!-- NOTE: Tab switching handled fully in script.js -->
   <nav class="tabs">
     <button class="tab active" data-tab="home">Home</button>
     <button class="tab" data-tab="archive">Archive</button>
     <button class="tab" data-tab="playlists">Playlists</button>
     <button class="tab" data-tab="account">Account</button>
+    <button class="tab" data-tab="recent">Recent</button>
+
+  
   </nav>
 
   <!-- ================= HOME TAB ================= -->
   <section id="home" class="tab-content active">
 
-    <!-- SEARCH -->
+    <!-- SEARCH INPUT -->
+    <!-- Used for: local songs filter + YouTube search -->
     <input
       id="search"
       type="text"
       placeholder="Search local songs or YouTube..."
     />
 
-    <!-- 🔴 YOUTUBE RESULTS -->
+    <!-- 🔴 YOUTUBE SEARCH RESULTS -->
+    <!-- JS will inject <li> items here -->
     <ul id="youtubeResults"></ul>
 
+    <!-- LOCAL SONG LIST -->
     <h3>Local Songs</h3>
+
+    <!-- Songs rendered dynamically -->
     <ul id="songs"></ul>
 
   </section>
+  <!-- ================= RECENT TAB ================= -->
+<section id="recent" class="tab-content">
+
+  <h3>🕒 Recently Played</h3>
+  <ul id="recentSongs"></ul>
+
+  <p style="font-size:12px;opacity:0.7;">
+    Songs you played recently (saved locally)
+  </p>
+
+</section>
+
 
   <!-- ================= ARCHIVE TAB ================= -->
   <section id="archive" class="tab-content">
 
-    <h3>🌍 Internet Archive</h3>
+    <h3>🌍 Internet Archive +</h3>
 
+    <!-- Archive search (NO API KEY REQUIRED) -->
     <input
       id="archiveSearch"
       type="text"
       placeholder="Search millions of free songs..."
     />
 
+    <!-- Archive song results injected by JS -->
     <ul id="archiveSongs"></ul>
 
+    <!-- Legal notice -->
     <p style="font-size:12px;opacity:0.7;margin-top:10px;">
       Source: Internet Archive • Public Domain / Creative Commons
     </p>
@@ -66,6 +91,7 @@
 
     <h3>📂 Playlists</h3>
 
+    <!-- Playlist creation -->
     <input
       id="playlistName"
       type="text"
@@ -74,10 +100,12 @@
 
     <button id="createPlaylist">Create</button>
 
+    <!-- Playlist selector -->
     <select id="playlistSelect">
       <option value="">Select playlist</option>
     </select>
 
+    <!-- Playlist list -->
     <ul id="playlists"></ul>
 
   </section>
@@ -88,13 +116,16 @@
     <p>Login & profile coming soon.</p>
   </section>
 
-  <!-- ================= STICKY MINI PLAYER ================= -->
+  <!-- ================= MINI PLAYER (STICKY) ================= -->
+  <!-- Global audio player controlled by JS -->
   <div id="miniPlayer">
 
+    <!-- Currently playing title -->
     <div id="miniInfo">
       <span id="miniTitle">No song playing</span>
     </div>
 
+    <!-- PLAYER CONTROLS -->
     <div id="miniControls">
       <button id="prevBtn">⏮</button>
       <button id="playPauseBtn">⏯</button>
@@ -103,7 +134,7 @@
       <button id="shuffleBtn">🔀</button>
       <button id="repeatBtn">🔁</button>
 
-      <!-- 🔊 VOLUME -->
+      <!-- 🔊 VOLUME CONTROL -->
       <input
         type="range"
         id="volumeSlider"
@@ -114,17 +145,21 @@
       />
     </div>
 
-    <!-- GLOBAL AUDIO PLAYER -->
+    <!-- GLOBAL AUDIO ELEMENT -->
+    <!-- Source is set dynamically by script.js -->
     <audio id="audio"></audio>
 
   </div>
 
-  <!-- FOOTER -->
+  <!-- ================= FOOTER ================= -->
   <footer>
     <p>Made by <strong>Deepu</strong> & <strong>Harshit</strong></p>
     <p>Educational project</p>
   </footer>
 
+  <!-- MAIN SCRIPT -->
+  <!-- IMPORTANT: Must be loaded AFTER DOM -->
   <script src="script.js"></script>
+
 </body>
 </html>
