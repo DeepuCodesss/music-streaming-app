@@ -205,6 +205,7 @@ footer {
     border-top: 1px solid #222;
   }
 }
+
 /* ---------- VOLUME SLIDER ---------- */
 #volumeSlider {
   width: 90px;
@@ -215,7 +216,6 @@ footer {
   cursor: pointer;
 }
 
-/* Chrome / Edge */
 #volumeSlider::-webkit-slider-thumb {
   appearance: none;
   width: 12px;
@@ -225,7 +225,6 @@ footer {
   cursor: pointer;
 }
 
-/* Firefox */
 #volumeSlider::-moz-range-thumb {
   width: 12px;
   height: 12px;
@@ -234,9 +233,94 @@ footer {
   cursor: pointer;
 }
 
-/* Mobile: hide volume slider (Spotify does this too) */
 @media (max-width: 600px) {
   #volumeSlider {
     display: none;
+  }
+}
+
+/* =====================================================
+   ===== PROFESSIONAL UI ENHANCEMENTS (ADDED ONLY) =====
+   ===================================================== */
+
+/* Smooth global animations */
+* {
+  transition: background-color 0.25s ease,
+              color 0.25s ease,
+              transform 0.2s ease,
+              box-shadow 0.25s ease;
+}
+
+/* Header polish */
+header h1 {
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+/* Tabs hover feedback */
+.tab:hover {
+  background: #3a3a3a;
+  transform: translateY(-1px);
+}
+
+.tab.active:hover {
+  background: #1ed760;
+}
+
+/* Search focus glow */
+#search:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(29,185,84,0.4);
+}
+
+/* Song card elevation */
+#songs li:hover {
+  background: #222;
+  transform: scale(1.01);
+}
+
+/* Playlist item hover */
+#playlists li:hover {
+  background: #222;
+}
+
+/* Buttons hover polish */
+button:hover {
+  filter: brightness(1.1);
+}
+
+/* Mini player shadow */
+#miniPlayer {
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+}
+
+/* Mini player button hover */
+#miniControls button:hover {
+  background: #3a3a3a;
+}
+
+/* Active mini button pulse */
+#miniControls button.active {
+  box-shadow: 0 0 0 2px rgba(29,185,84,0.4);
+}
+
+/* Footer subtle fade */
+footer {
+  opacity: 0.8;
+}
+
+/* Improve readability on large screens */
+@media (min-width: 1000px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+/* Better tap feedback for mobile */
+@media (max-width: 600px) {
+  .tab,
+  #songs li,
+  #miniControls button {
+    -webkit-tap-highlight-color: transparent;
   }
 }
