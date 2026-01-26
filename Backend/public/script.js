@@ -41,6 +41,43 @@ const recentSongsList = document.getElementById("recentSongs");
 const youtubeResults = document.getElementById("youtubeResults");
 
 /*************************************************
+ * PROGRESS BAR ELEMENTS
+ *************************************************/
+const progressBar = document.getElementById("progressBar");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+
+/*************************************************
+ * AUDIO PROGRESS & SEEK
+ *************************************************/
+
+// Update progress while playing
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progressBar.value = percent;
+
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+// Seek when user drags
+progressBar.addEventListener("input", () => {
+  if (!audio.duration) return;
+
+  const seekTime = (progressBar.value / 100) * audio.duration;
+  audio.currentTime = seekTime;
+});
+
+// Format seconds → mm:ss
+function formatTime(sec) {
+  const minutes = Math.floor(sec / 60);
+  const seconds = Math.floor(sec % 60);
+  return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+}
+
+/*************************************************
  * YOUTUBE API
  *************************************************/
 const YT_API_KEY = "AIzaSyD_Ua_hr7Gam0p2pU62cGyWfAyosWlge-c";
