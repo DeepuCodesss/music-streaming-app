@@ -324,3 +324,157 @@ footer {
     -webkit-tap-highlight-color: transparent;
   }
 }
+/*************************************************
+ * ===== PRO UI ENHANCEMENTS (SAFE ADDITION) =====
+ * No removals. Only overrides & polish.
+ *************************************************/
+
+/* ---------- GLOBAL DEPTH & SMOOTHNESS ---------- */
+body {
+  background: linear-gradient(180deg, #121212 0%, #0b0b0b 100%);
+}
+
+* {
+  transition: background 0.25s ease,
+              color 0.25s ease,
+              transform 0.15s ease,
+              box-shadow 0.25s ease;
+}
+
+/* ---------- HEADER UPGRADE ---------- */
+header {
+  background: radial-gradient(circle at top, #1db95433, transparent 70%);
+  border-bottom: 1px solid #1f1f1f;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+
+/* ---------- TAB BAR (PRO NAV) ---------- */
+.tabs {
+  backdrop-filter: blur(10px);
+}
+
+.tab {
+  box-shadow: inset 0 0 0 1px #2a2a2a;
+}
+
+.tab:hover {
+  transform: translateY(-1px);
+  color: white;
+}
+
+.tab.active {
+  box-shadow: 0 8px 24px #1db95455;
+}
+
+/* ---------- SEARCH BAR (PREMIUM FEEL) ---------- */
+#search,
+#archiveSearch {
+  box-shadow: inset 0 0 0 1px #333;
+}
+
+#search:focus,
+#archiveSearch:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1db95488;
+}
+
+/* ---------- LIST ITEMS (CARD STYLE) ---------- */
+#songs li,
+#archiveSongs li,
+#recentSongs li,
+#playlists li {
+  position: relative;
+  overflow: hidden;
+}
+
+#songs li::after,
+#archiveSongs li::after,
+#recentSongs li::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #1db95422, transparent);
+  opacity: 0;
+}
+
+#songs li:hover::after,
+#archiveSongs li:hover::after,
+#recentSongs li:hover::after {
+  opacity: 1;
+}
+
+#songs li:hover,
+#archiveSongs li:hover,
+#recentSongs li:hover {
+  transform: scale(1.015);
+}
+
+/* ---------- ACTIVE SONG (GLOW) ---------- */
+#songs li.active {
+  box-shadow: 0 12px 30px #1db95466;
+}
+
+/* ---------- MINI PLAYER (PRO PLAYER BAR) ---------- */
+#miniPlayer {
+  background: linear-gradient(180deg, #181818, #111);
+  box-shadow: 0 -10px 30px #000000aa;
+}
+
+#miniControls button:hover {
+  transform: scale(1.15);
+}
+
+#miniControls button:active {
+  transform: scale(0.95);
+}
+
+/* ---------- PLAY / PAUSE MAIN BUTTON ---------- */
+#playPauseBtn {
+  background: #1db954;
+  color: black;
+  font-size: 16px;
+}
+
+#playPauseBtn:hover {
+  box-shadow: 0 0 20px #1db954aa;
+}
+
+/* ---------- VOLUME SLIDER ENHANCEMENT ---------- */
+#volumeSlider {
+  background: linear-gradient(90deg, #1db954, #555);
+}
+
+/* ---------- SECTION HEADERS ---------- */
+h3 {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+  opacity: 0.6;
+}
+
+/* ---------- SCROLLBAR (DESKTOP) ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1db954;
+}
