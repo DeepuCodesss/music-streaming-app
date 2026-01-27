@@ -21,6 +21,7 @@ tabs.forEach(tab => {
  * ELEMENTS
  *************************************************/
 const audio = document.getElementById("audio");
+
 const songsList = document.getElementById("songs");
 const searchInput = document.getElementById("search");
 const volumeSlider = document.getElementById("volumeSlider");
@@ -39,6 +40,7 @@ const recentSongsList = document.getElementById("recentSongs");
 
 
 const youtubeResults = document.getElementById("youtubeResults");
+
 
 /*************************************************
  * PROGRESS BAR ELEMENTS
@@ -676,3 +678,65 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 window.loadArchiveItem = loadArchiveItem;
 
+/*************************************************
+ * KEYBOARD SHORTCUTS (PLAYER CONTROLS)
+ *************************************************/
+document.addEventListener("keydown", (e) => {
+
+  // Ignore typing inside inputs
+  if (
+    e.target.tagName === "INPUT" ||
+    e.target.tagName === "TEXTAREA"
+  ) {
+    return;
+  }
+
+  switch (e.code) {
+
+    // ▶ Play / Pause
+    case "Space":
+      e.preventDefault(); // ⛔ stop page scroll
+      if (!audio.src) return;
+      audio.paused ? audio.play() : audio.pause();
+      break;
+
+    // ⏭ Next track
+    case "KeyN":
+      playNext();
+      break;
+
+    // ⏮ Previous track
+    case "KeyP":
+      playPrev();
+      break;
+
+    // ⏪ Seek backward 5s
+    case "ArrowLeft":
+      e.preventDefault();
+      audio.currentTime = Math.max(0, audio.currentTime - 5);
+      break;
+
+    // ⏩ Seek forward 5s
+    case "ArrowRight":
+      e.preventDefault();
+      audio.currentTime = Math.min(
+        audio.duration || 0,
+        audio.currentTime + 5
+      );
+      break;
+
+    // 🔊 Volume up
+    case "ArrowUp":
+      e.preventDefault();
+      audio.volume = Math.min(1, audio.volume + 0.05);
+      if (volumeSlider) volumeSlider.value = audio.volume * 100;
+      break;
+
+    // 🔉 Volume down
+    case "ArrowDown":
+      e.preventDefault();
+      audio.volume = Math.max(0, audio.volume - 0.05);
+      if (volumeSlider) volumeSlider.value = audio.volume * 100;
+      break;
+  }
+});
